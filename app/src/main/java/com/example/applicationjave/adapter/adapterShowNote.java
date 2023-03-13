@@ -50,6 +50,8 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
     public void onBindViewHolder(final ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
 
         holder.note.setText(mData.get(position).getText());
+        holder.header.setText(mData.get(position).getHeader());
+
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +76,7 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView note;
+        public TextView header;
 
         public ImageView delete;
         public CardView card;
@@ -81,6 +84,7 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
         ViewHolder(View itemView) {
             super(itemView);
             this.note = itemView.findViewById(R.id.note);
+            this.header = itemView.findViewById(R.id.header);
             this.delete = itemView.findViewById(R.id.delete);
             this.card = itemView.findViewById(R.id.card2);
             itemView.setOnClickListener(this);

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Application;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,10 +35,13 @@ public class Home extends AppCompatActivity implements adapterShowNote.ItemClick
     RecyclerView rv;
     ImageView delete;
     EditText updateNote;
+    EditText updateheader  ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+//        updateHeader = findViewById(R.id.update_header);
+
         updateNote = findViewById(R.id.update_Note);
         rv = findViewById(R.id.rvRecyc);
         items = new ArrayList<notes>();
@@ -65,7 +69,9 @@ public class Home extends AppCompatActivity implements adapterShowNote.ItemClick
                                 if (documentSnapshot.exists()) {
                                     String id = documentSnapshot.getId();
                                     String noteText = documentSnapshot.getString("note");
-                                    notes note = new notes(id,noteText );
+                                    String notheader = documentSnapshot.getString("header");
+
+                                    notes note = new notes(id,  notheader ,   noteText );
                                     items.add(note);
                                     rv.setLayoutManager(layoutManager);
                                     rv.setHasFixedSize(true);
@@ -96,6 +102,7 @@ public class Home extends AppCompatActivity implements adapterShowNote.ItemClick
                         items.remove(note);
                         adapter.notifyDataSetChanged();
 
+
                         Toast.makeText( getApplicationContext(), "successfully deleted " , Toast.LENGTH_SHORT).show();
 
                     }
@@ -115,28 +122,47 @@ public class Home extends AppCompatActivity implements adapterShowNote.ItemClick
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Name");
         final View customLayout = getLayoutInflater().inflate(R.layout.dialog, null);
+
         builder.setView(customLayout);
-       builder.setPositiveButton(
+        updateNote = customLayout.findViewById(R.id.update_Note);
+        updateheader = customLayout.findViewById(R.id.update_header);
+        updateheader = customLayout.findViewById(R.id.update_header);
+
+        updateNote.setText(note.getText());
+        updateheader.setText(note.getHeader());
+
+        builder.setPositiveButton(
                 "Update",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        updateNote = customLayout.findViewById(R.id.update_Note);
+                         updateNote = customLayout.findViewById(R.id.update_Note);
+                         updateheader = customLayout.findViewById(R.id.update_header);
 
-                        db.collection("Notes").document(note.getId()).update("note", updateNote.getText().toString())
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        adapter.notifyDataSetChanged();
+                            db.collection("Notes").document(note.getId()).update("note", updateNote.getText().toString()
+                                    ,
+                                           "header", updateheader.getText().toString()
 
-                                        Log.d("nada", "DocumentSnapshot successfully updated!");
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.w("nada", "Error updating document", e);
-                                    }
-                                });
+
+                                    )
+                                   .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                       @Override
+                                       public void onSuccess(Void aVoid) {
+//                                           Intent intent = new Intent(getApplicationContext(), Home.class);
+//                                           startActivity(intent);
+                                           items.clear();
+
+                                            adapter.notifyDataSetChanged();
+                                           Log.d("nada", "DocumentSnapshot successfully updated!");
+                                       }
+                                   })
+                                   .addOnFailureListener(new OnFailureListener() {
+                                       @Override
+                                       public void onFailure(@NonNull Exception e) {
+                                           Log.w("nada", "Error updating document", e);
+                                       }
+                                   });
+
+
                     }
                 });
         AlertDialog dialog = builder.create();

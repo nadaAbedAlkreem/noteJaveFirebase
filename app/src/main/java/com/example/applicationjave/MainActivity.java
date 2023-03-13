@@ -24,6 +24,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     EditText editTextNote;
+    EditText editTextHeader;
     Button buttonSave;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     ProgressDialog progressDialog;
@@ -32,8 +33,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        editTextNote = findViewById(R.id.et_note);
-        buttonSave = findViewById(R.id.btn_save);
+        editTextNote  = findViewById(R.id.et_note);
+        editTextHeader= findViewById(R.id.et_header);
+        buttonSave    = findViewById(R.id.btn_save);
 
 
 
@@ -47,12 +49,16 @@ public class MainActivity extends AppCompatActivity {
     public void saveToFirebase(View view) {
 
         String note  = editTextNote.getText().toString();
+        String header  = editTextHeader.getText().toString();
 
         Map<String, Object> notes = new HashMap<>();
         if (!note.isEmpty()) {
             notes.put("note", note);
+            notes.put("header", header);
+
             db.collection("Notes")
                     .add(notes)
+
                     .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                               @Override
                                               public void onSuccess(DocumentReference documentReference) {
