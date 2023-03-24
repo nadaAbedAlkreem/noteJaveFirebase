@@ -1,21 +1,18 @@
 package com.example.applicationjave;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Application;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.applicationjave.Model.category;
 import com.example.applicationjave.Model.notes;
 import com.example.applicationjave.adapter.adapterShowCategory;
 import com.example.applicationjave.adapter.adapterShowNote;
@@ -31,38 +28,46 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-public class Home extends AppCompatActivity   implements   adapterShowNote.ItemClickListener2{
+public class Category extends AppCompatActivity  implements   adapterShowCategory.ItemClickListener2{
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    ArrayList<notes> items;
-    adapterShowNote adapter;
+    ArrayList<category> items;
+    adapterShowCategory adapter;
     LinearLayoutManager layoutManager = new LinearLayoutManager(this);
     RecyclerView rv;
-      private FirebaseAnalytics mFirebaseAnalytics;
     Calendar calendar = Calendar.getInstance() ;
     int houres  = calendar.get(Calendar.HOUR) ;
     int minutes  = calendar.get(Calendar.MINUTE) ;
     int second  = calendar.get(Calendar.SECOND) ;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-         rv = findViewById(R.id.rvRecyc);
-        items = new ArrayList<notes>();
-        adapter = new adapterShowNote(this, items, this);
-         screenTrack("HOME");
-        GetAllUserss();
+        setContentView(R.layout.activity_category);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+         rv = findViewById(R.id.rec_category);
+        items = new ArrayList<category>();
+        screenTrack("category");
 
-
+        adapter = new adapterShowCategory(this, items, this);
+         GetAllUserss();
 
 
     }
-//
+
+    public void btnEvent (String id   , String  name , String  contentType){
+        Bundle bundle =  new Bundle() ;
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID  , id);
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME  , name);
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE  , contentType);
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT   , bundle);
+
+
+    }
     private void GetAllUserss() {
-        Intent intent = getIntent();
-        String idCategoryCurrent =  intent.getStringExtra("id")  ;
-         db.collection("Notes").whereEqualTo("id_category"  , idCategoryCurrent).get()
+
+        db.collection("category").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot documentSnapshots) {
@@ -73,11 +78,10 @@ public class Home extends AppCompatActivity   implements   adapterShowNote.ItemC
                             for (DocumentSnapshot documentSnapshot : documentSnapshots) {
                                 if (documentSnapshot.exists()) {
                                     String id = documentSnapshot.getId();
-                                    String noteText = documentSnapshot.getString("note");
-                                    String notheader = documentSnapshot.getString("header");
+                                    String category_name = documentSnapshot.getString("name");
 
-                                    notes note = new notes(id,  notheader ,   noteText );
-                                    items.add(note);
+                                    category category_ = new category(id,  category_name  );
+                                    items.add(category_);
                                     rv.setLayoutManager(layoutManager);
                                     rv.setHasFixedSize(true);
                                     rv.setAdapter(adapter);
@@ -100,37 +104,19 @@ public class Home extends AppCompatActivity   implements   adapterShowNote.ItemC
     @Override
     public void onItemClick2(int position, String id) {
         btnEvent("btn1" , "btn click category"  , "event button");
-        Intent intent = new Intent(this, details.class);
+        Intent intent = new Intent(this, Home.class);
         intent.putExtra("id" , items.get(position).getId());
         startActivity(intent);
     }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-        super.onPointerCaptureChanged(hasCapture);
-    }
-
-
-      public void btnEvent (String id   , String  name , String  contentType){
+    public  void screenTrack(String name){
         Bundle bundle =  new Bundle() ;
-        bundle.putString(FirebaseAnalytics.Param.ITEM_ID  , id);
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME  , name);
-        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE  , contentType);
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT   , bundle);
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS  , "Main home " );
+
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW   , bundle);
 
 
-      }
-      public  void screenTrack(String name){
-          Bundle bundle =  new Bundle() ;
-          bundle.putString(FirebaseAnalytics.Param.ITEM_NAME  , name);
-          bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS  , "Main home " );
-
-          mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW   , bundle);
-
-
-      }
-
-
+    }
 
     @Override
     protected void onPause() {
@@ -146,7 +132,7 @@ public class Home extends AppCompatActivity   implements   adapterShowNote.ItemC
         time.put("hourse" , h ) ;
         time.put("minuset" , m ) ;
         time.put("second" , s ) ;
-        time.put("screen_name" , "Home" ) ;
+        time.put("screen_name" , "Category" ) ;
 
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -155,18 +141,18 @@ public class Home extends AppCompatActivity   implements   adapterShowNote.ItemC
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                           @Override
                                           public void onSuccess(DocumentReference documentReference) {
-                                               Log.e("TAG", "Data added successfully to database");
-                                           }
+                                              Log.e("TAG", "Data added successfully to database");
                                           }
-                                      )
+                                      }
+                )
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.e("TAG", "Failed to add database");
 
 
-                                      }
-                            });
+                    }
+                });
         super.onPause();
     }
 

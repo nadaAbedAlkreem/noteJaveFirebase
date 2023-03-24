@@ -2,53 +2,53 @@ package com.example.applicationjave.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-//import com.google.firebase.firestore.auth.User;
-
-import com.example.applicationjave.Home;
+import com.example.applicationjave.Model.category;
 import com.example.applicationjave.Model.notes;
 import com.example.applicationjave.R;
 
 import java.util.List;
 
+//public class adapterShowCategory {
+//}
+//
 
 
-public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHolder> {
+public class adapterShowCategory extends RecyclerView.Adapter<adapterShowCategory.ViewHolder> {
 
-    private List<notes> mData;
+    private List<category> mData;
     private LayoutInflater mInflater;
-    private ItemClickListener2 itemClickListener2;
+    private  ItemClickListener2 itemClickListener2;
 
 
-    public adapterShowNote(Context context, List<notes> data , ItemClickListener2 onClick2) {
+
+    public adapterShowCategory(Context context, List<category> data , ItemClickListener2 onClick2 ) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
-         this.itemClickListener2 = onClick2;
+        this.itemClickListener2 = onClick2;
+
+
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.card_note, parent, false);
+        View view = mInflater.inflate(R.layout.card_category, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
 
-//        holder.note.setText(mData.get(position).getText());
-        holder.header.setText(mData.get(position).getHeader());
-
-
+        holder.name.setText(mData.get(position).getName());
+        holder.id.setText(mData.get(position).getId());
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,6 +56,8 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
 
             }
         });
+
+
     }
 
     @Override
@@ -65,17 +67,16 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-//        public TextView note;
-        public TextView header;
+         public TextView name;
+         public TextView id;
 
-        public ImageView delete;
-        public CardView card;
+         public CardView card;
 
         ViewHolder(View itemView) {
             super(itemView);
-//            this.note = itemView.findViewById(R.id.note);
-            this.header = itemView.findViewById(R.id.header);
-             this.card = itemView.findViewById(R.id.card2);
+            this.name = itemView.findViewById(R.id.name);
+            this.id = itemView.findViewById(R.id.id);
+            this.card = itemView.findViewById(R.id.card2);
             itemView.setOnClickListener(this);
         }
 
@@ -86,9 +87,10 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
 
     }
 
-    notes getItem(int id) {
+    category getItem(int id) {
         return mData.get(id);
     }
+
 
 
 

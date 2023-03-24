@@ -19,51 +19,6 @@
             android:layout_marginTop="150dp"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_logo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="20dp"
-                android:fontFamily="casual"
-                android:text="add note "
-                android:textAlignment="center"
-                android:textColor="#E2A258DF"
-                android:textSize="50sp" />
-
-            <EditText
-                android:id="@+id/et_header"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/et_custom"
-                android:fontFamily="@font/roboto_regular"
-                android:hint="header"
-                android:inputType="textPersonName"
-                android:padding="15dp"
-                android:textColor="@color/colorPurple"
-                android:textColorHint="#ACA5A8"
-                android:textSize="15sp" />
-
-            <EditText
-                android:id="@+id/et_note"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/et_custom"
-                android:fontFamily="@font/roboto_regular"
-                android:hint="note"
-                android:inputType="textPersonName"
-                android:padding="15dp"
-                android:textColor="@color/colorPurple"
-                android:textColorHint="#ACA5A8"
-                android:textSize="15sp" />
-
 
             <RelativeLayout
                 android:layout_width="match_parent"
