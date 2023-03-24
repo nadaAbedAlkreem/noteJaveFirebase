@@ -17,52 +17,47 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.applicationjave.Model.notes;
-import com.example.applicationjave.adapter.adapterShowCategory;
 import com.example.applicationjave.adapter.adapterShowNote;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
 
-public class Home extends AppCompatActivity   implements   adapterShowNote.ItemClickListener2{
+public class Home extends AppCompatActivity implements adapterShowNote.ItemClickListener, adapterShowNote.ItemClickListener2 {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     ArrayList<notes> items;
     adapterShowNote adapter;
     LinearLayoutManager layoutManager = new LinearLayoutManager(this);
     RecyclerView rv;
-      private FirebaseAnalytics mFirebaseAnalytics;
-    Calendar calendar = Calendar.getInstance() ;
-    int houres  = calendar.get(Calendar.HOUR) ;
-    int minutes  = calendar.get(Calendar.MINUTE) ;
-    int second  = calendar.get(Calendar.SECOND) ;
+    ImageView delete;
+    EditText updateNote;
+    EditText updateheader  ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-         rv = findViewById(R.id.rvRecyc);
+//        updateHeader = findViewById(R.id.update_header);
+
+        updateNote = findViewById(R.id.update_Note);
+        rv = findViewById(R.id.rvRecyc);
         items = new ArrayList<notes>();
-        adapter = new adapterShowNote(this, items, this);
-         screenTrack("HOME");
+        adapter = new adapterShowNote(this, items, this, this);
+        delete = findViewById(R.id.delete);
+
+
         GetAllUserss();
 
 
 
-
     }
-//
+
     private void GetAllUserss() {
-        Intent intent = getIntent();
-        String idCategoryCurrent =  intent.getStringExtra("id")  ;
-         db.collection("Notes").whereEqualTo("id_category"  , idCategoryCurrent).get()
+
+        db.collection("Notes").get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot documentSnapshots) {
@@ -97,77 +92,98 @@ public class Home extends AppCompatActivity   implements   adapterShowNote.ItemC
                 });
     }
 
-    @Override
-    public void onItemClick2(int position, String id) {
-        btnEvent("btn1" , "btn click category"  , "event button");
-        Intent intent = new Intent(this, details.class);
-        intent.putExtra("id" , items.get(position).getId());
+    public void Delete(final notes note) {
+        db.collection("Notes").document(note.getId())
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.e("nada", "deleted");
+                        items.remove(note);
+                        adapter.notifyDataSetChanged();
+
+
+                        Toast.makeText( getApplicationContext(), "successfully deleted " , Toast.LENGTH_SHORT).show();
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("nada", "fail");
+                        Toast.makeText( getApplicationContext(), "faild deleted " , Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+    }
+
+
+    public void updateNote(final notes note) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Name");
+        final View customLayout = getLayoutInflater().inflate(R.layout.dialog, null);
+
+        builder.setView(customLayout);
+        updateNote = customLayout.findViewById(R.id.update_Note);
+        updateheader = customLayout.findViewById(R.id.update_header);
+        updateheader = customLayout.findViewById(R.id.update_header);
+
+        updateNote.setText(note.getText());
+        updateheader.setText(note.getHeader());
+
+        builder.setPositiveButton(
+                "Update",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                         updateNote = customLayout.findViewById(R.id.update_Note);
+                         updateheader = customLayout.findViewById(R.id.update_header);
+
+                            db.collection("Notes").document(note.getId()).update("note", updateNote.getText().toString()
+                                    ,
+                                           "header", updateheader.getText().toString()
+
+
+                                    )
+                                   .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                       @Override
+                                       public void onSuccess(Void aVoid) {
+//                                           Intent intent = new Intent(getApplicationContext(), Home.class);
+//                                           startActivity(intent);
+                                           items.clear();
+
+                                            adapter.notifyDataSetChanged();
+                                           Log.d("nada", "DocumentSnapshot successfully updated!");
+                                       }
+                                   })
+                                   .addOnFailureListener(new OnFailureListener() {
+                                       @Override
+                                       public void onFailure(@NonNull Exception e) {
+                                           Log.w("nada", "Error updating document", e);
+                                       }
+                                   });
+
+
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public void addNote(View view) {
+         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
     @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-        super.onPointerCaptureChanged(hasCapture);
-    }
+    public void onItemClick(int position, String id) {
+        Delete(items.get(position));
 
-
-      public void btnEvent (String id   , String  name , String  contentType){
-        Bundle bundle =  new Bundle() ;
-        bundle.putString(FirebaseAnalytics.Param.ITEM_ID  , id);
-        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME  , name);
-        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE  , contentType);
-        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT   , bundle);
-
-
-      }
-      public  void screenTrack(String name){
-          Bundle bundle =  new Bundle() ;
-          bundle.putString(FirebaseAnalytics.Param.ITEM_NAME  , name);
-          bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS  , "Main home " );
-
-          mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW   , bundle);
-
-
-      }
-
-
+}
 
     @Override
-    protected void onPause() {
-
-        Calendar calendar = Calendar.getInstance() ;
-        int houres2  = calendar.get(Calendar.HOUR) ;
-        int minutes2  = calendar.get(Calendar.MINUTE) ;
-        int second2  = calendar.get(Calendar.SECOND) ;
-        int h = houres2 - houres  ;
-        int m = minutes2   - minutes  ;
-        int s = second2 - second ;
-        HashMap<String , Object > time  = new HashMap<>() ;
-        time.put("hourse" , h ) ;
-        time.put("minuset" , m ) ;
-        time.put("second" , s ) ;
-        time.put("screen_name" , "Home" ) ;
+    public void onItemClick2(int position, String id) {
+        updateNote(items.get(position));
 
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("trackUser")
-                .add(time)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                                          @Override
-                                          public void onSuccess(DocumentReference documentReference) {
-                                               Log.e("TAG", "Data added successfully to database");
-                                           }
-                                          }
-                                      )
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("TAG", "Failed to add database");
-
-
-                                      }
-                            });
-        super.onPause();
     }
-
 }

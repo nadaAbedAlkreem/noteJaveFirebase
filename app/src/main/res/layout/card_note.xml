@@ -46,11 +46,31 @@
                         android:textColor="#000000"
                         android:textSize="16sp" />
 
+                    <TextView
+                        android:id="@+id/note"
+                        android:layout_width="54dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="15dp"
+                        android:text="note"
+                        android:textColor="#000000"
+                        android:textSize="16sp" />
+
 
                 </LinearLayout>
 
 
             </LinearLayout>
+
+            <ImageView
+                android:id="@+id/delete"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginLeft="100dp"
+                android:backgroundTint="#579C27B0"
+                android:onClick="deleteUser"
+                android:src="@drawable/ic_delete"
+                android:text="ADD" />
 
 
         </androidx.cardview.widget.CardView>

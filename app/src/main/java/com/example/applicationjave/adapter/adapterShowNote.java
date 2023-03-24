@@ -15,11 +15,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 //import com.google.firebase.firestore.auth.User;
 
-import com.example.applicationjave.Home;
 import com.example.applicationjave.Model.notes;
 import com.example.applicationjave.R;
 
 import java.util.List;
+
+//public class adapterShowNote   {
+//}
 
 
 
@@ -27,13 +29,15 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
 
     private List<notes> mData;
     private LayoutInflater mInflater;
+    private ItemClickListener mClickListener;
     private ItemClickListener2 itemClickListener2;
 
 
-    public adapterShowNote(Context context, List<notes> data , ItemClickListener2 onClick2) {
+    public adapterShowNote(Context context, List<notes> data, ItemClickListener onClick, ItemClickListener2 onClick2) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
-         this.itemClickListener2 = onClick2;
+        this.mClickListener = onClick;
+        this.itemClickListener2 = onClick2;
     }
 
     @Override
@@ -45,10 +49,16 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
     @Override
     public void onBindViewHolder(final ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
 
-//        holder.note.setText(mData.get(position).getText());
+        holder.note.setText(mData.get(position).getText());
         holder.header.setText(mData.get(position).getHeader());
 
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mClickListener.onItemClick(holder.getAdapterPosition(), mData.get(position).getId());
 
+            }
+        });
         holder.card.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,7 +75,7 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-//        public TextView note;
+        public TextView note;
         public TextView header;
 
         public ImageView delete;
@@ -73,9 +83,10 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
 
         ViewHolder(View itemView) {
             super(itemView);
-//            this.note = itemView.findViewById(R.id.note);
+            this.note = itemView.findViewById(R.id.note);
             this.header = itemView.findViewById(R.id.header);
-             this.card = itemView.findViewById(R.id.card2);
+            this.delete = itemView.findViewById(R.id.delete);
+            this.card = itemView.findViewById(R.id.card2);
             itemView.setOnClickListener(this);
         }
 
@@ -90,7 +101,13 @@ public class adapterShowNote extends RecyclerView.Adapter<adapterShowNote.ViewHo
         return mData.get(id);
     }
 
+    void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
 
+    public interface ItemClickListener {
+        void onItemClick(int position, String id);
+    }
 
     public interface ItemClickListener2{
         void onItemClick2(int position, String id);
